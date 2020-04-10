@@ -5,6 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
+	"github.com/rithikjain/LiveQnA/api/handler"
 	"github.com/rithikjain/LiveQnA/pkg/user"
 	"log"
 	"net/http"
