@@ -65,7 +65,7 @@ func main() {
 
 	defer db.Close()
 	fmt.Println("Connected to DB...")
-	db.LogMode(true)
+	//db.LogMode(true)
 
 	// Setting up the router
 	r := http.NewServeMux()
