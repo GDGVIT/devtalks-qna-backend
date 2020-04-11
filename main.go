@@ -28,8 +28,8 @@ func dbConnect(host, port, user, dbname, password, sslmode string) (*gorm.DB, er
 func GetPort() string {
 	var port = os.Getenv("PORT")
 	if port == "" {
-		fmt.Println("INFO: No PORT environment variable detected, defaulting to 3000")
-		return "localhost:3000"
+		fmt.Println("INFO: No PORT environment variable detected, defaulting to 4000")
+		return "localhost:4000"
 	}
 	return ":" + port
 }
