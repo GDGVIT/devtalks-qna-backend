@@ -21,12 +21,25 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-// Function for writing to the websocket
-func (c *Client) writeWS() {
+// Listen for closing
+func (c *Client) readWS() {
 	defer func() {
 		c.hub.Unregister <- c
 		_ = c.conn.Close()
 	}()
+	for {
+		_, _, err := c.conn.ReadMessage()
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				log.Printf("error: %v", err)
+			}
+			break
+		}
+	}
+}
+
+// Function for writing to the websocket
+func (c *Client) writeWS() {
 	for {
 		select {
 		case que, ok := <-c.inbound:
@@ -61,4 +74,5 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	client.hub.Register <- client
 
 	go client.writeWS()
+	go client.readWS()
 }

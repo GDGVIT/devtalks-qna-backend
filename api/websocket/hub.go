@@ -27,12 +27,12 @@ func (h *Hub) Run() {
 		select {
 		case client := <-h.Register:
 			h.Clients[client] = true
-			log.Println("User Connected !")
+			log.Println("User Connected..")
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client]; ok {
 				delete(h.Clients, client)
 				close(client.inbound)
-				log.Println("User Disconnected !")
+				log.Println("User Disconnected..")
 			}
 		case que := <-h.Broadcast:
 			for client := range h.Clients {
