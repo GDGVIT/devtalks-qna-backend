@@ -9,6 +9,8 @@ import (
 type Repository interface {
 	CreateQuestion(question *Question) (*Question, error)
 
+	GetAllQuestions() (*[]Question, error)
+
 	IncreaseUpVote(questionID float64) (*Question, error)
 
 	DecreaseUpVote(questionID float64) (*Question, error)
@@ -34,6 +36,15 @@ func (r *repo) CreateQuestion(question *Question) (*Question, error) {
 		return nil, pkg.ErrDatabase
 	}
 	return question, nil
+}
+
+func (r *repo) GetAllQuestions() (*[]Question, error) {
+	var questions []Question
+	err := r.DB.Find(&questions).Error
+	if err != nil {
+		return nil, err
+	}
+	return &questions, nil
 }
 
 func (r *repo) IncreaseUpVote(questionID float64) (*Question, error) {

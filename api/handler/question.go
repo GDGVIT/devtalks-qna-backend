@@ -51,7 +51,31 @@ func sendQuestion(s question.Service, hub *websocket.Hub) http.Handler {
 	})
 }
 
+// Protected Request
+func viewAllQuestions(s question.Service) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			view.Wrap(view.ErrMethodNotAllowed, w)
+			return
+		}
+
+		questions, err := s.ViewAllQuestions()
+		if err != nil {
+			view.Wrap(err, w)
+			return
+		}
+		w.Header().Add("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
+			"message":   "All questions fetched",
+			"questions": questions,
+			"status":    http.StatusOK,
+		})
+	})
+}
+
 // Handler
 func MakeQuestionHandler(r *http.ServeMux, s question.Service, hub *websocket.Hub) {
 	r.Handle("/api/question/create", middleware.Validate(sendQuestion(s, hub)))
+	r.Handle("/api/question/view", middleware.Validate(viewAllQuestions(s)))
 }

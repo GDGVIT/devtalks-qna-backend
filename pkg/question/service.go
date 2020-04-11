@@ -5,6 +5,8 @@ import "github.com/rithikjain/LiveQnA/pkg/user"
 type Service interface {
 	CreateQuestion(question *Question) (*Question, error)
 
+	ViewAllQuestions() (*[]Question, error)
+
 	IncreaseUpVote(questionID float64) (*Question, error)
 
 	DecreaseUpVote(questionID float64) (*Question, error)
@@ -32,6 +34,10 @@ func (s *service) CreateQuestion(question *Question) (*Question, error) {
 		return nil, err
 	}
 	return que, nil
+}
+
+func (s *service) ViewAllQuestions() (*[]Question, error) {
+	return s.repo.GetAllQuestions()
 }
 
 func (s *service) IncreaseUpVote(questionID float64) (*Question, error) {
