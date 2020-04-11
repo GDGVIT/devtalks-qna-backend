@@ -8,3 +8,9 @@ type Question struct {
 	CreatedByEmail string `json:"created_by_email"`
 	UpVotes        uint   `json:"up_votes"`
 }
+
+type UpVoteDetail struct {
+	gorm.Model
+	Email      string
+	QuestionID uint
+}

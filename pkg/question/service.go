@@ -1,6 +1,9 @@
 package question
 
-import "github.com/rithikjain/LiveQnA/pkg/user"
+import (
+	"github.com/rithikjain/LiveQnA/pkg"
+	"github.com/rithikjain/LiveQnA/pkg/user"
+)
 
 type Service interface {
 	CreateQuestion(question *Question) (*Question, error)
@@ -41,19 +44,35 @@ func (s *service) ViewAllQuestions() (*[]Question, error) {
 }
 
 func (s *service) IncreaseUpVote(questionID float64, user *user.User) (*Question, error) {
-	que, err := s.repo.IncreaseUpVote(questionID, user)
+	alreadyUpVoted, err := s.repo.HasAlreadyUpVoted(questionID, user.Email)
 	if err != nil {
 		return nil, err
 	}
-	return que, nil
+	if !alreadyUpVoted {
+		que, err := s.repo.IncreaseUpVote(questionID, user)
+		if err != nil {
+			return nil, err
+		}
+		return que, nil
+	} else {
+		return nil, pkg.ErrNotAllowed
+	}
 }
 
 func (s *service) DecreaseUpVote(questionID float64, user *user.User) (*Question, error) {
-	que, err := s.repo.DecreaseUpVote(questionID, user)
+	alreadyUpVoted, err := s.repo.HasAlreadyUpVoted(questionID, user.Email)
 	if err != nil {
 		return nil, err
 	}
-	return que, nil
+	if alreadyUpVoted {
+		que, err := s.repo.DecreaseUpVote(questionID, user)
+		if err != nil {
+			return nil, err
+		}
+		return que, nil
+	} else {
+		return nil, pkg.ErrNotAllowed
+	}
 }
 
 func (s *service) DeleteQuestion(questionID float64) error {

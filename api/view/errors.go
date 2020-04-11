@@ -49,7 +49,7 @@ func Wrap(err error, w http.ResponseWriter) {
 		Message: msg,
 		Status:  code,
 	}
-	w.WriteHeader(code)
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(code)
 	_ = json.NewEncoder(w).Encode(errView)
 }

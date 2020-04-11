@@ -11,6 +11,8 @@ type Repository interface {
 
 	GetAllQuestions() (*[]Question, error)
 
+	HasAlreadyUpVoted(questionID float64, email string) (bool, error)
+
 	IncreaseUpVote(questionID float64, user *user.User) (*Question, error)
 
 	DecreaseUpVote(questionID float64, user *user.User) (*Question, error)
@@ -47,6 +49,19 @@ func (r *repo) GetAllQuestions() (*[]Question, error) {
 	return &questions, nil
 }
 
+func (r *repo) HasAlreadyUpVoted(questionID float64, email string) (bool, error) {
+	detail := &UpVoteDetail{}
+	err := r.DB.Where("question_id = ? and email = ?", questionID, email).First(detail).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return false, nil
+		} else {
+			return true, pkg.ErrDatabase
+		}
+	}
+	return true, nil
+}
+
 func (r *repo) IncreaseUpVote(questionID float64, user *user.User) (*Question, error) {
 	question := &Question{}
 	result := r.DB.Where("ID = ?", questionID).First(question)
@@ -59,6 +74,10 @@ func (r *repo) IncreaseUpVote(questionID float64, user *user.User) (*Question, e
 		question.UpVotes += 1
 		result = r.DB.Save(question)
 		if result.Error != nil {
+			return nil, pkg.ErrDatabase
+		}
+		detail := &UpVoteDetail{Email: user.Email, QuestionID: question.ID}
+		if err := r.DB.Save(detail).Error; err != nil {
 			return nil, pkg.ErrDatabase
 		}
 		return question, nil
@@ -78,6 +97,10 @@ func (r *repo) DecreaseUpVote(questionID float64, user *user.User) (*Question, e
 			question.UpVotes -= 1
 			result = r.DB.Save(question)
 			if result.Error != nil {
+				return nil, pkg.ErrDatabase
+			}
+			detail := &UpVoteDetail{QuestionID: question.ID, Email: user.Email}
+			if err := r.DB.Delete(detail).Error; err != nil {
 				return nil, pkg.ErrDatabase
 			}
 		}

@@ -61,6 +61,7 @@ func main() {
 	// Creating the tables
 	db.AutoMigrate(&user.User{})
 	db.AutoMigrate(&question.Question{})
+	db.AutoMigrate(&question.UpVoteDetail{})
 
 	defer db.Close()
 	fmt.Println("Connected to DB...")
