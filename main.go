@@ -6,6 +6,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
 	"github.com/rithikjain/LiveQnA/api/handler"
+	"github.com/rithikjain/LiveQnA/api/websocket"
 	"github.com/rithikjain/LiveQnA/pkg/question"
 	"github.com/rithikjain/LiveQnA/pkg/user"
 	"log"
@@ -68,15 +69,32 @@ func main() {
 	// Setting up the router
 	r := http.NewServeMux()
 
+	// Setting up the hub
+	hub := websocket.NewHub()
+	go hub.Run()
+
+	// Users
 	userRepo := user.NewRepo(db)
 	userSvc := user.NewService(userRepo)
 	handler.MakeUserHandler(r, userSvc)
 
+	// Questions
+	questionRepo := question.NewRepo(db)
+	questionSvc := question.NewService(questionRepo)
+	handler.MakeQuestionHandler(r, questionSvc, hub)
+
+	// To check if server up or not
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("Hello There"))
 		return
 	})
+
+	// Handling the websocket connection
+	r.HandleFunc("/api/ws", func(w http.ResponseWriter, r *http.Request) {
+		websocket.ServeWS(hub, w, r)
+	})
+
 	fmt.Println("Serving...")
 	log.Fatal(http.ListenAndServe(GetPort(), r))
 }
