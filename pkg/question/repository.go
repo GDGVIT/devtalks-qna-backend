@@ -3,6 +3,7 @@ package question
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/rithikjain/LiveQnA/pkg"
+	"github.com/rithikjain/LiveQnA/pkg/user"
 )
 
 type Repository interface {
@@ -13,6 +14,8 @@ type Repository interface {
 	DecreaseUpVote(questionID float64) (*Question, error)
 
 	DeleteQuestion(questionID float64) error
+
+	GetUser(userID float64) (*user.User, error)
 }
 
 type repo struct {
@@ -74,4 +77,13 @@ func (r *repo) DeleteQuestion(questionID float64) error {
 		return pkg.ErrDatabase
 	}
 	return nil
+}
+
+func (r *repo) GetUser(userID float64) (*user.User, error) {
+	user := &user.User{}
+	result := r.DB.Where("id = ?", userID).First(user)
+	if result.Error == gorm.ErrRecordNotFound {
+		return nil, pkg.ErrNotFound
+	}
+	return user, nil
 }

@@ -23,6 +23,17 @@ func sendQuestion(s question.Service, hub *websocket.Hub) http.Handler {
 			return
 		}
 
+		// Getting the user from claims
+		claims, err := middleware.ValidateAndGetClaims(r.Context(), "user")
+		if err != nil {
+			view.Wrap(err, w)
+			return
+		}
+		user, err := s.GetUser(claims["id"].(float64))
+
+		// Setting email in question as user email
+		queRequest.CreatedByEmail = user.Email
+
 		que, err := s.CreateQuestion(queRequest)
 		if err != nil {
 			view.Wrap(err, w)

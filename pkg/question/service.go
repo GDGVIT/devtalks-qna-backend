@@ -1,5 +1,7 @@
 package question
 
+import "github.com/rithikjain/LiveQnA/pkg/user"
+
 type Service interface {
 	CreateQuestion(question *Question) (*Question, error)
 
@@ -8,6 +10,8 @@ type Service interface {
 	DecreaseUpVote(questionID float64) (*Question, error)
 
 	DeleteQuestion(questionID float64) error
+
+	GetUser(userID float64) (*user.User, error)
 
 	GetRepo() Repository
 }
@@ -52,6 +56,14 @@ func (s *service) DeleteQuestion(questionID float64) error {
 		return err
 	}
 	return nil
+}
+
+func (s *service) GetUser(userID float64) (*user.User, error) {
+	user, err := s.repo.GetUser(userID)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func (s *service) GetRepo() Repository {
