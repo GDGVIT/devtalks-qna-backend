@@ -13,4 +13,5 @@ var (
 	ErrForbidden    = errors.New("Error: Access to this resource is forbidden")
 	ErrEmail        = errors.New("Error: Email not valid")
 	ErrPassword     = errors.New("Error: Password must be greater than 6 chars")
+	ErrNotAllowed   = errors.New("Error: Cant upvote own answer")
 )

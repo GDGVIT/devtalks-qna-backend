@@ -1,7 +1,6 @@
 package user
 
 import (
-	"errors"
 	"github.com/rithikjain/LiveQnA/pkg"
 	"golang.org/x/crypto/bcrypt"
 	"strings"
@@ -51,7 +50,7 @@ func (s *service) Register(user *User) (*User, error) {
 	}
 	if exists {
 		//noinspection GoErrorStringFormat
-		return nil, errors.New("User already exists")
+		return nil, pkg.ErrExists
 	}
 	pass, err := HashPassword(user.Password)
 	if err != nil {

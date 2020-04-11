@@ -16,7 +16,8 @@ type ErrView struct {
 var (
 	ErrMethodNotAllowed = errors.New("Error: Method is not allowed")
 	ErrInvalidToken     = errors.New("Error: Invalid Authorization token")
-	ErrUserExists       = errors.New("User already exists")
+	ErrUserExists       = errors.New("Error: User already exists")
+	ErrNoParameter      = errors.New("Error: No parameter provided for question ID")
 )
 
 var ErrHTTPStatusMap = map[string]int{
@@ -29,9 +30,11 @@ var ErrHTTPStatusMap = map[string]int{
 	pkg.ErrForbidden.Error():    http.StatusForbidden,
 	pkg.ErrEmail.Error():        http.StatusBadRequest,
 	pkg.ErrPassword.Error():     http.StatusBadRequest,
+	pkg.ErrNotAllowed.Error():   http.StatusBadRequest,
 	ErrMethodNotAllowed.Error(): http.StatusMethodNotAllowed,
 	ErrInvalidToken.Error():     http.StatusBadRequest,
-	ErrUserExists.Error():       http.StatusConflict,
+	ErrUserExists.Error():       http.StatusBadRequest,
+	ErrNoParameter.Error():      http.StatusBadRequest,
 }
 
 func Wrap(err error, w http.ResponseWriter) {
@@ -42,12 +45,11 @@ func Wrap(err error, w http.ResponseWriter) {
 		code = http.StatusInternalServerError
 	}
 
-	w.WriteHeader(code)
-	w.Header().Add("Content-Type", "application/json; charset=utf-8")
-
 	errView := ErrView{
 		Message: msg,
 		Status:  code,
 	}
+	w.WriteHeader(code)
+	w.Header().Add("Content-Type", "application/json; charset=utf-8")
 	_ = json.NewEncoder(w).Encode(errView)
 }

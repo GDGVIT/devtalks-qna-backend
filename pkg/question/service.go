@@ -7,9 +7,9 @@ type Service interface {
 
 	ViewAllQuestions() (*[]Question, error)
 
-	IncreaseUpVote(questionID float64) (*Question, error)
+	IncreaseUpVote(questionID float64, user *user.User) (*Question, error)
 
-	DecreaseUpVote(questionID float64) (*Question, error)
+	DecreaseUpVote(questionID float64, user *user.User) (*Question, error)
 
 	DeleteQuestion(questionID float64) error
 
@@ -40,16 +40,16 @@ func (s *service) ViewAllQuestions() (*[]Question, error) {
 	return s.repo.GetAllQuestions()
 }
 
-func (s *service) IncreaseUpVote(questionID float64) (*Question, error) {
-	que, err := s.repo.IncreaseUpVote(questionID)
+func (s *service) IncreaseUpVote(questionID float64, user *user.User) (*Question, error) {
+	que, err := s.repo.IncreaseUpVote(questionID, user)
 	if err != nil {
 		return nil, err
 	}
 	return que, nil
 }
 
-func (s *service) DecreaseUpVote(questionID float64) (*Question, error) {
-	que, err := s.repo.DecreaseUpVote(questionID)
+func (s *service) DecreaseUpVote(questionID float64, user *user.User) (*Question, error) {
+	que, err := s.repo.DecreaseUpVote(questionID, user)
 	if err != nil {
 		return nil, err
 	}

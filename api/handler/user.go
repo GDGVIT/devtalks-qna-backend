@@ -117,5 +117,5 @@ func userDetails(svc user.Service) http.Handler {
 func MakeUserHandler(r *http.ServeMux, svc user.Service) {
 	r.Handle("/api/user/register", register(svc))
 	r.Handle("/api/user/login", login(svc))
-	r.Handle("/api/user", middleware.Validate(userDetails(svc)))
+	r.Handle("/api/user/details", middleware.Validate(userDetails(svc)))
 }
