@@ -76,10 +76,10 @@ func (r *repo) DecreaseUpVote(questionID float64, user *user.User) (*Question, e
 	} else {
 		if question.UpVotes != 0 {
 			question.UpVotes -= 1
-		}
-		result = r.DB.Save(question)
-		if result.Error != nil {
-			return nil, pkg.ErrDatabase
+			result = r.DB.Save(question)
+			if result.Error != nil {
+				return nil, pkg.ErrDatabase
+			}
 		}
 		return question, nil
 	}
