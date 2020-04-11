@@ -28,7 +28,8 @@ func register(svc user.Service) http.Handler {
 			view.Wrap(err, w)
 			return
 		}
-		w.WriteHeader(http.StatusCreated)
+
+		// Handling JWT
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"id":   u.Email,
 			"role": "user",
@@ -40,6 +41,7 @@ func register(svc user.Service) http.Handler {
 		}
 		u.Password = ""
 		w.Header().Add("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusCreated)
 		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"message": "Account Created",
 			"token":   tokenString,
