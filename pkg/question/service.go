@@ -10,6 +10,8 @@ type Service interface {
 
 	ViewAllQuestions() (*[]Question, error)
 
+	ViewAllQuestionsByUpVotes() (*[]Question, error)
+
 	IncreaseUpVote(questionID float64, user *user.User) (*Question, error)
 
 	DecreaseUpVote(questionID float64, user *user.User) (*Question, error)
@@ -41,6 +43,10 @@ func (s *service) CreateQuestion(question *Question) (*Question, error) {
 
 func (s *service) ViewAllQuestions() (*[]Question, error) {
 	return s.repo.GetAllQuestions()
+}
+
+func (s *service) ViewAllQuestionsByUpVotes() (*[]Question, error) {
+	return s.repo.GetAllQuestionsByUpVotes()
 }
 
 func (s *service) IncreaseUpVote(questionID float64, user *user.User) (*Question, error) {

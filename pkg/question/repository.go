@@ -11,6 +11,8 @@ type Repository interface {
 
 	GetAllQuestions() (*[]Question, error)
 
+	GetAllQuestionsByUpVotes() (*[]Question, error)
+
 	HasAlreadyUpVoted(questionID float64, email string) (bool, error)
 
 	IncreaseUpVote(questionID float64, user *user.User) (*Question, error)
@@ -43,6 +45,15 @@ func (r *repo) CreateQuestion(question *Question) (*Question, error) {
 func (r *repo) GetAllQuestions() (*[]Question, error) {
 	var questions []Question
 	err := r.DB.Find(&questions).Error
+	if err != nil {
+		return nil, err
+	}
+	return &questions, nil
+}
+
+func (r *repo) GetAllQuestionsByUpVotes() (*[]Question, error) {
+	var questions []Question
+	err := r.DB.Order("up_votes desc").Find(&questions).Error
 	if err != nil {
 		return nil, err
 	}

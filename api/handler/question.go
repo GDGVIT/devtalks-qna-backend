@@ -76,6 +76,29 @@ func viewAllQuestions(s question.Service) http.Handler {
 }
 
 // Protected Request
+func viewAllQuestionsByUpVotes(s question.Service) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			view.Wrap(view.ErrMethodNotAllowed, w)
+			return
+		}
+
+		questions, err := s.ViewAllQuestionsByUpVotes()
+		if err != nil {
+			view.Wrap(err, w)
+			return
+		}
+		w.Header().Add("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
+			"message":   "All questions fetched",
+			"questions": questions,
+			"status":    http.StatusOK,
+		})
+	})
+}
+
+// Protected Request
 func increaseUpVote(s question.Service, hub *websocket.Hub) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -159,6 +182,7 @@ func decreaseUpVote(s question.Service, hub *websocket.Hub) http.Handler {
 func MakeQuestionHandler(r *http.ServeMux, s question.Service, hub *websocket.Hub) {
 	r.Handle("/api/question/create", middleware.Validate(sendQuestion(s, hub)))
 	r.Handle("/api/question/view", middleware.Validate(viewAllQuestions(s)))
+	r.Handle("/api/question/viewbyupvotes", middleware.Validate(viewAllQuestionsByUpVotes(s)))
 	r.Handle("/api/question/upvote", middleware.Validate(increaseUpVote(s, hub)))
 	r.Handle("/api/question/downvote", middleware.Validate(decreaseUpVote(s, hub)))
 }
