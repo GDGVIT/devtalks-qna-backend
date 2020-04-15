@@ -6,6 +6,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
 	"github.com/rithikjain/LiveQnA/api/handler"
+	"github.com/rithikjain/LiveQnA/api/middleware"
 	"github.com/rithikjain/LiveQnA/api/websocket"
 	"github.com/rithikjain/LiveQnA/pkg/question"
 	"github.com/rithikjain/LiveQnA/pkg/user"
@@ -96,6 +97,9 @@ func main() {
 		websocket.ServeWS(hub, w, r)
 	})
 
+	// Adding Cors middleware
+	mwCors := middleware.CorsEverywhere(r)
+
 	fmt.Println("Serving...")
-	log.Fatal(http.ListenAndServe(GetPort(), r))
+	log.Fatal(http.ListenAndServe(GetPort(), mwCors))
 }
